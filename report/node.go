@@ -198,3 +198,44 @@ func (n Node) Merge(other Node) Node {
 		Children:       n.Children.Merge(other.Children),
 	}
 }
+
+// UnsafeUnMerge removes data from n that would be added by merging other,
+// modifying the original.
+// returns true if n.Merge(other) is the same as n
+func (n *Node) UnsafeUnMerge(other Node) bool {
+	// If it's not the same ID and topology then just bail out
+	if n.ID != other.ID || n.Topology != other.Topology {
+		return false
+	}
+	n.ID = ""
+	n.Topology = ""
+	remove := true
+	if n.LatestControls.EqualUnderMerge(other.LatestControls) {
+		n.LatestControls = nil
+	} else {
+		remove = false
+	}
+	if n.Latest.EqualUnderMerge(other.Latest) {
+		n.Latest = nil
+	} else {
+		remove = false
+	}
+	if n.Sets.DeepEqual(other.Sets) {
+		n.Sets = MakeSets()
+	} else {
+		remove = false
+	}
+	if n.Parents.DeepEqual(other.Parents) {
+		n.Parents = MakeSets()
+	} else {
+		remove = false
+	}
+	if n.Adjacency.Equal(other.Adjacency) {
+		n.Adjacency = nil
+	} else {
+		remove = false
+	}
+	// counters and children are not created in the probe so we don't check those
+	// metrics don't overlap so just check if we have any
+	return remove && len(n.Metrics) == 0
+}

@@ -351,6 +351,16 @@ func (r *Report) UnsafeMerge(other Report) {
 	})
 }
 
+// UnsafeUnMerge removes any information from r that would be added by merging other.
+// The original is modified.
+func (r *Report) UnsafeUnMerge(other Report) {
+	// TODO: DNS, Sampling, Plugins
+	r.Window = r.Window - other.Window
+	r.WalkPairedTopologies(&other, func(ourTopology, theirTopology *Topology) {
+		ourTopology.UnsafeUnMerge(*theirTopology)
+	})
+}
+
 // WalkTopologies iterates through the Topologies of the report,
 // potentially modifying them
 func (r *Report) WalkTopologies(f func(*Topology)) {
@@ -584,6 +594,12 @@ func (s Sampling) Merge(other Sampling) Sampling {
 		Count: s.Count + other.Count,
 		Total: s.Total + other.Total,
 	}
+}
+
+// UnMerge removes any information from s that would be added by merging other.
+func (s Sampling) UnMerge(other Sampling) Sampling {
+	// TODO
+	return s
 }
 
 const (

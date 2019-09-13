@@ -198,6 +198,21 @@ func (m StringLatestMap) DeepEqual(n StringLatestMap) bool {
 	return true
 }
 
+// EqualUnderMerge should return true if m.Merge(n) is the same as m.
+// We interpret this as "ignoring timestamps", i.e. if all keys and
+// values are the same that's good enough.
+func (m StringLatestMap) EqualUnderMerge(n StringLatestMap) bool {
+	if m.Size() != n.Size() {
+		return false
+	}
+	for i := range m {
+		if m[i].key != n[i].key || m[i].Value != n[i].Value {
+			return false
+		}
+	}
+	return true
+}
+
 // CodecEncodeSelf implements codec.Selfer.
 // Duplicates the output for a built-in map without generating an
 // intermediate copy of the data structure, to save time.  Note this
@@ -444,6 +459,21 @@ func (m NodeControlDataLatestMap) DeepEqual(n NodeControlDataLatestMap) bool {
 	}
 	for i := range m {
 		if m[i].key != n[i].key || !m[i].Equal(&n[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+// EqualUnderMerge should return true if m.Merge(n) is the same as m.
+// We interpret this as "ignoring timestamps", i.e. if all keys and
+// values are the same that's good enough.
+func (m NodeControlDataLatestMap) EqualUnderMerge(n NodeControlDataLatestMap) bool {
+	if m.Size() != n.Size() {
+		return false
+	}
+	for i := range m {
+		if m[i].key != n[i].key || m[i].Value != n[i].Value {
 			return false
 		}
 	}
