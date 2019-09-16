@@ -115,15 +115,6 @@ func (rep *Report) ReadBinary(ctx context.Context, r io.Reader, gzipped bool, ms
 	return nil
 }
 
-// MakeFromBinary constructs a Report from a gzipped msgpack.
-func MakeFromBinary(ctx context.Context, r io.Reader) (*Report, error) {
-	rep := MakeReport()
-	if err := rep.ReadBinary(ctx, r, true, true); err != nil {
-		return nil, err
-	}
-	return &rep, nil
-}
-
 // MakeFromFile construct a Report from a file, with the encoding
 // determined by the extension (".msgpack" or ".json", with an
 // optional ".gz").
